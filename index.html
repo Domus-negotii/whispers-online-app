@@ -139,58 +139,63 @@
     <!-- Firebase SDKs (using v11) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, query, addDoc, doc, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // --- Global Variables (provided by Canvas) ---
-        // This is the correct way to get the Firebase config in the Canvas environment.
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         // --- Firebase Initialization and Auth ---
         let app, db, auth;
         let userId = 'N/A';
+        
+        // Access global variables provided by the Canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        // Define the Firestore collection path dynamically
         const collectionPath = `artifacts/${appId}/public/data/secrets`;
+
         const userIdDisplay = document.getElementById('user-id-display');
         const toastElement = document.getElementById('toast-message');
+        const emptyStateElement = document.getElementById('empty-state');
+        const whisperCountElement = document.getElementById('whisper-count');
 
         // Function to initialize Firebase and set up authentication
         const setupFirebase = async () => {
             try {
-                // Check if the firebaseConfig object is properly populated
-                if (!firebaseConfig) {
-                    console.error("Firebase config is missing. Please run this app in the Canvas environment.");
-                    showToast('App failed to initialize: Firebase config incomplete.', 'error');
+                // Ensure firebaseConfig is not empty
+                if (Object.keys(firebaseConfig).length === 0) {
+                    console.error("Firebase configuration is missing.");
+                    showToast('Firebase configuration is missing.', 'error');
                     return;
                 }
-                
+
                 // Initialize Firebase services
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
                 
-                // Sign in the user, either with the custom token or anonymously
+                // Sign in the user using the provided token or anonymously
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
                 } else {
                     await signInAnonymously(auth);
                 }
                 
-                // Set up auth state listener after successful sign-in
+                // Wait for auth state to be ready
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         userId = user.uid;
                         userIdDisplay.textContent = `User ID: ${userId}`;
                         startRealtimeListener();
                     } else {
-                        console.error('Authentication failed.');
-                        showToast('Authentication failed. Please try again.', 'error');
+                        console.log("User not signed in.");
+                        showToast('User not signed in. Please refresh.', 'error');
                     }
                 });
+
             } catch (error) {
                 console.error("Error during Firebase setup:", error);
-                showToast('App failed to initialize. Please check console.', 'error');
+                showToast('App failed to initialize. Please check the console.', 'error');
             }
         };
 
@@ -213,6 +218,9 @@
                 // Sort the secrets by timestamp in descending order in the client
                 secrets.sort((a, b) => b.timestamp - a.timestamp);
                 renderSecrets(secrets);
+            }, (error) => {
+                console.error("Error in snapshot listener: ", error);
+                showToast(`Error: ${error.message}. Please check your Firestore security rules.`, 'error');
             });
         };
 
@@ -230,8 +238,6 @@
         const secretInput = document.getElementById('secret-input');
         const confessButton = document.getElementById('confess-button');
         const secretsContainer = document.getElementById('secrets-container');
-        const whisperCountElement = document.getElementById('whisper-count');
-        const emptyStateElement = document.getElementById('empty-state');
         const charCounterElement = document.getElementById('char-counter');
         const showThoughtButton = document.getElementById('show-thought-button');
         const positiveThoughtModal = document.getElementById('positive-thought-modal');
@@ -384,7 +390,7 @@
             const button = e.target.closest('[data-emotion-label]');
             if (!button) return;
 
-            const emotionLabel = button.dataset.emotion-label;
+            const emotionLabel = button.dataset.emotionLabel;
             const secretCard = button.closest('[data-secret-id]');
             const secretId = secretCard.dataset.secretId;
             
