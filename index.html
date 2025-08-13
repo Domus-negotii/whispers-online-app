@@ -28,7 +28,7 @@
         }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #6b7a63; /* Updated background color */
+            background-color: #1a202c; /* A dark gray background for the body */
         }
         .animate-fade-in {
             animation: fadeIn 0.5s ease-out forwards;
@@ -36,27 +36,17 @@
         .animate-modal-fade-in {
             animation: modalFadeIn 0.3s ease-out forwards;
         }
-        .toast {
-            transition: opacity 0.3s ease-in-out;
-        }
     </style>
 </head>
-<body class="bg-[#6b7a63] text-gray-100 font-sans p-4 flex flex-col items-center min-h-screen">
+<body class="bg-gray-900 text-gray-100 font-sans p-4 flex flex-col items-center min-h-screen">
 
-    <!-- User ID display for debugging and collaboration -->
-    <div id="user-id-display" class="fixed top-2 right-2 text-xs text-gray-800 bg-white p-2 rounded-lg shadow-md z-50">
-        User ID: N/A
-    </div>
-
-    <!-- Error/Success Toast Notification -->
-    <div id="toast-message" class="toast fixed bottom-4 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl shadow-lg text-white font-medium z-50 hidden">
-        <!-- Message will be displayed here -->
-    </div>
-
-    <div class="w-full max-w-4xl mx-auto my-8 p-6 bg-[#5b6a53] rounded-2xl shadow-2xl border border-[#7d8b74]">
+    <div class="w-full max-w-4xl mx-auto my-8 p-6 bg-gray-800 rounded-2xl shadow-2xl border border-gray-700">
         <div class="text-center mb-8">
-            <p class="text-gray-200 text-lg">Share your secret anonymously with the world and see how others react.</p>
-            <div id="whisper-count" class="mt-2 text-sm text-[#a5b29c]">
+            <h1 class="text-5xl font-bold mb-2 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Whispers Online
+            </h1>
+            <p class="text-gray-400 text-lg">Share your secret anonymously with the world and see how others react.</p>
+            <div id="whisper-count" class="mt-2 text-sm text-gray-500">
                 ✨ 0 whispers shared so far
             </div>
         </div>
@@ -65,13 +55,13 @@
             <div class="relative">
                 <textarea
                     id="secret-input"
-                    class="w-full p-4 rounded-xl border-2 border-[#7d8b74] bg-[#4a5544] text-base text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 resize-none placeholder-gray-400"
+                    class="w-full p-4 rounded-xl border-2 border-gray-700 bg-gray-900 text-base text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 resize-none placeholder-gray-500"
                     placeholder="What's weighing on your heart? Share it anonymously..."
                     rows="4"
                     required
                     maxLength="500"
                 ></textarea>
-                <div id="char-counter" class="absolute bottom-2 right-2 text-xs text-[#a5b29c]">
+                <div id="char-counter" class="absolute bottom-2 right-2 text-xs text-gray-400">
                     0/500
                 </div>
             </div>
@@ -84,10 +74,10 @@
             </button>
         </form>
 
-        <!-- New Positive Thought Button -->
+        <!-- Positive Thought Button -->
         <button
             id="show-thought-button"
-            class="w-full mt-4 px-6 py-3 bg-[#7d8b74] text-gray-900 font-semibold rounded-xl hover:bg-[#8da081] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 shadow-lg transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center space-x-2"
+            class="w-full mt-4 px-6 py-3 bg-gray-700 text-gray-300 font-semibold rounded-xl hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 shadow-lg transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center space-x-2"
             title="Click for a positive thought!"
         >
             <span class="text-xl">✨</span>
@@ -104,14 +94,14 @@
                 <!-- Secrets will be dynamically inserted here -->
             </div>
 
-            <div id="empty-state" class="text-center text-[#a5b29c] py-12 hidden">
+            <div id="empty-state" class="text-center text-gray-500 py-12 hidden">
               <div class="text-6xl mb-4">🤐</div>
               <p class="text-xl">No secrets yet.</p>
               <p class="text-sm mt-2">Be the first to share your whisper!</p>
             </div>
         </div>
 
-        <div class="text-center text-sm text-[#a5b29c] pt-6 border-t border-[#7d8b74]">
+        <div class="text-center text-sm text-gray-500 pt-6 border-t border-gray-700">
             <p>💫 All whispers are anonymous and ephemeral</p>
             <p class="mt-1">Share your truth, find your peace</p>
         </div>
@@ -119,7 +109,7 @@
 
     <!-- Positive Thought Modal -->
     <div id="positive-thought-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden animate-modal-fade-in">
-        <div class="bg-[#5b6a53] p-8 rounded-2xl shadow-xl w-full max-w-md border border-[#7d8b74] relative">
+        <div class="bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-700 relative">
             <button id="close-modal-button" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -129,7 +119,7 @@
                 <h3 class="text-2xl font-bold bg-gradient-to-r from-green-400 to-teal-400 bg-clip-text text-transparent mb-4">
                     A Positive Thought for You!
                 </h3>
-                <p id="thought-text" class="text-lg text-gray-200 italic">
+                <p id="thought-text" class="text-lg text-gray-300 italic">
                     <!-- Positive thought will be inserted here -->
                 </p>
             </div>
@@ -139,29 +129,34 @@
     <!-- Firebase SDKs (using v11) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, query, addDoc, doc, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, query, addDoc, doc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Global Variables (provided by Canvas) ---
+        // --- Firebase Setup ---
+        // These global variables are provided by the canvas environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAqS0bu0qSL7ukndGY5GhJHzx5k2zNAzDk",
+            authDomain: "whispers-secrets-0000.firebaseapp.com",
+            projectId: "whispers-secrets-0000",
+            storageBucket: "whispers-secrets-0000.firebasestorage.app",
+            messagingSenderId: "194376346890",
+            appId: "1:194376346890:web:04618d77ff46df96681ef3"
+        };
 
-        // --- Firebase Initialization and Auth ---
-        let app, db, auth;
-        let userId = 'N/A';
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        // Use a public collection path so everyone can see the secrets
         const collectionPath = `artifacts/${appId}/public/data/secrets`;
-        const userIdDisplay = document.getElementById('user-id-display');
-        const toastElement = document.getElementById('toast-message');
 
-        // Function to initialize Firebase and set up authentication
+        // --- Authentication and Firestore Listener ---
         const setupFirebase = async () => {
             try {
-                // Initialize Firebase services
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                
                 // Sign in the user, either with the custom token or anonymously
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
@@ -169,46 +164,32 @@
                     await signInAnonymously(auth);
                 }
                 
-                // Set up auth state listener after successful sign-in
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        userIdDisplay.textContent = `User ID: ${userId}`;
-                        startRealtimeListener();
-                    } else {
-                        console.error('Authentication failed.');
-                        showToast('Authentication failed. Please try again.', 'error');
-                    }
-                });
+                // Once authentication is complete, start the real-time listener
+                startRealtimeListener();
             } catch (error) {
                 console.error("Error during Firebase setup:", error);
-                showToast('App failed to initialize. Please check console.', 'error');
             }
         };
 
-        // Function to set up the Firestore listener for real-time updates
         const startRealtimeListener = () => {
-            if (!db) {
-                console.error('Firestore not initialized.');
-                return;
-            }
-
-            // Listen for all secrets and sort them client-side
+            // Fetch all documents and sort them in-memory to avoid index issues with orderBy()
             const q = query(collection(db, collectionPath));
-            
             onSnapshot(q, (snapshot) => {
                 const secrets = snapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data(),
+                    // Use a safe fallback for the timestamp if it's missing
                     timestamp: doc.data().timestamp?.toDate().getTime() || Date.now()
                 }));
-                // Sort the secrets by timestamp in descending order in the client
+                // Sort posts by timestamp in descending order
                 secrets.sort((a, b) => b.timestamp - a.timestamp);
                 renderSecrets(secrets);
+            }, (error) => {
+                console.error("Error fetching posts: ", error);
             });
         };
 
-        // --- UI & State Management ---
+        // Define the data and DOM elements
         const emotions = [
             { emoji: '❤️', label: 'Love' },
             { emoji: '😂', label: 'Laugh' },
@@ -225,56 +206,27 @@
         const whisperCountElement = document.getElementById('whisper-count');
         const emptyStateElement = document.getElementById('empty-state');
         const charCounterElement = document.getElementById('char-counter');
+
         const showThoughtButton = document.getElementById('show-thought-button');
         const positiveThoughtModal = document.getElementById('positive-thought-modal');
         const thoughtTextElement = document.getElementById('thought-text');
         const closeModalButton = document.getElementById('close-modal-button');
 
-        const positiveThoughts = [
-            "Believe you can and you're halfway there.",
-            "The best way to predict the future is to create it.",
-            "Your limitation—it's only your imagination.",
-            "Push yourself, because no one else is going to do it for you.",
-            "Great things never come from comfort zones.",
-            "The future belongs to those who believe in the beauty of their dreams.",
-            "Go the extra mile. It's never crowded.",
-            "Success is not final, failure is not fatal: it is the courage to continue that counts.",
-            "The only way to do great work is to love what you do.",
-            "Don't wait for opportunity. Create it.",
-            "What you get by achieving your goals is not as important as what you become by achieving your goals.",
-        ];
-        
-        // --- Utility Functions ---
-        const showToast = (message, type = 'info') => {
-            let bgColorClass;
-            if (type === 'error') {
-                bgColorClass = 'bg-red-500';
-            } else if (type === 'success') {
-                bgColorClass = 'bg-green-500';
-            } else {
-                bgColorClass = 'bg-gray-700';
-            }
-            toastElement.textContent = message;
-            toastElement.className = `toast fixed bottom-4 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl shadow-lg text-white font-medium z-50 ${bgColorClass}`;
-            toastElement.classList.remove('hidden');
-
-            setTimeout(() => {
-                toastElement.classList.add('hidden');
-            }, 3000);
-        };
-
+        // Function to format the timestamp
         const formatTime = (timestamp) => {
             const now = Date.now();
             const diff = now - timestamp;
+            
             if (diff < 60000) return 'Just now';
             if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
             if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
             return `${Math.floor(diff / 86400000)}d ago`;
         };
 
-        // --- Rendering Logic ---
+        // Function to render all secrets to the page
         const renderSecrets = (secrets) => {
-            secretsContainer.innerHTML = '';
+            secretsContainer.innerHTML = ''; // Clear existing secrets
+            
             whisperCountElement.textContent = `✨ ${secrets.length} whispers shared so far`;
 
             if (secrets.length === 0) {
@@ -283,18 +235,18 @@
                 emptyStateElement.style.display = 'none';
                 secrets.forEach((secret, index) => {
                     const secretElement = document.createElement('div');
-                    secretElement.className = "group p-6 bg-[#5b6a53] rounded-xl shadow-lg border border-[#7d8b74] hover:shadow-xl transition-all duration-300 hover:scale-[1.01]";
+                    secretElement.className = "group p-6 bg-gray-700 rounded-xl shadow-lg border border-gray-600 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]";
                     secretElement.style.animationDelay = `${index * 0.1}s`;
                     secretElement.classList.add('animate-fade-in');
                     secretElement.dataset.secretId = secret.id;
 
-                    const reactionButtonsHtml = emotions.map(emotion => {
+                    let reactionButtonsHtml = emotions.map(emotion => {
                         const count = secret.reactions[emotion.label] || 0;
                         return `
                             <button
                                 type="button"
                                 data-emotion-label="${emotion.label}"
-                                class="flex items-center px-3 py-2 rounded-full border border-[#7d8b74] bg-[#4a5544] text-gray-300 text-sm font-medium hover:bg-[#3d4538] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95"
+                                class="flex items-center px-3 py-2 rounded-full border border-gray-600 bg-gray-800 text-gray-300 text-sm font-medium hover:bg-gray-900 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-sm hover:shadow-md transform hover:scale-105 active:scale-95"
                                 title="React with ${emotion.label}"
                             >
                                 <span class="text-lg mr-2">${emotion.emoji}</span>
@@ -312,7 +264,7 @@
                             <p class="text-lg text-gray-200 leading-relaxed flex-1 mr-4">
                                 "${secret.secret}"
                             </p>
-                            <span class="text-xs text-[#a5b29c] whitespace-nowrap">
+                            <span class="text-xs text-gray-400 whitespace-nowrap">
                                 ${formatTime(secret.timestamp)}
                             </span>
                         </div>
@@ -320,7 +272,7 @@
                             ${reactionButtonsHtml}
                         </div>
                         <div class="mt-3 text-center">
-                            <span class="text-xs text-[#a5b29c]">
+                            <span class="text-xs text-gray-400">
                                 ${totalReactions} total reactions
                             </span>
                         </div>
@@ -330,20 +282,12 @@
             }
         };
 
-        // --- Event Handlers ---
+        // Handle form submission for a new secret
         const handleConfess = async (e) => {
             e.preventDefault();
             
             const newSecretText = secretInput.value.trim();
-            if (newSecretText === '') {
-                showToast('Please enter a secret to confess.', 'error');
-                return;
-            }
-
-            if (!db) {
-                showToast('App is not connected. Please refresh.', 'error');
-                return;
-            }
+            if (newSecretText === '') return;
 
             confessButton.disabled = true;
             confessButton.innerHTML = `<div class="flex items-center justify-center">
@@ -355,37 +299,36 @@
                 const newSecretObj = {
                     secret: newSecretText,
                     reactions: emotions.reduce((acc, emotion) => ({ ...acc, [emotion.label]: 0 }), {}),
-                    timestamp: new Date(),
+                    // Use a server timestamp for accurate ordering
+                    timestamp: serverTimestamp(),
                 };
                 
+                // Add the new secret to the public collection
                 await addDoc(collection(db, collectionPath), newSecretObj);
                 
                 secretInput.value = '';
-                showToast('Your secret has been shared!', 'success');
-            } catch (error) {
-                console.error("Error writing document: ", error);
-                showToast('Failed to share secret. Please try again.', 'error');
-            } finally {
                 confessButton.disabled = false;
                 confessButton.innerHTML = `🤫 Confess Anonymously`;
                 charCounterElement.textContent = '0/500';
+            } catch (error) {
+                console.error("Error writing document: ", error);
+                confessButton.disabled = false;
+                confessButton.innerHTML = `🤫 Confess Anonymously`;
             }
         };
 
+        // Handle a user clicking an emotion button
         const handleReaction = async (e) => {
             const button = e.target.closest('[data-emotion-label]');
             if (!button) return;
 
-            const emotionLabel = button.dataset.emotionLabel;
+            const emotionLabel = button.dataset.emotion-label;
             const secretCard = button.closest('[data-secret-id]');
             const secretId = secretCard.dataset.secretId;
             
-            if (!db) {
-                showToast('App is not connected. Please refresh.', 'error');
-                return;
-            }
             const docRef = doc(db, collectionPath, secretId);
 
+            // Use a transaction to safely increment the counter
             try {
                 await runTransaction(db, async (transaction) => {
                     const secretDoc = await transaction.get(docRef);
@@ -398,32 +341,62 @@
                 });
             } catch (error) {
                 console.error("Transaction failed: ", error);
-                showToast('Failed to add reaction. Please try again.', 'error');
             }
         };
-        
-        // --- Event Listeners ---
-        const addListeners = () => {
-            confessForm.addEventListener('submit', handleConfess);
-            secretsContainer.addEventListener('click', handleReaction);
-            secretInput.addEventListener('input', (e) => {
-                charCounterElement.textContent = `${e.target.value.length}/500`;
-            });
-            showThoughtButton.addEventListener('click', () => {
-                const randomIndex = Math.floor(Math.random() * positiveThoughts.length);
-                thoughtTextElement.textContent = positiveThoughts[randomIndex];
-                positiveThoughtModal.classList.remove('hidden');
-            });
-            closeModalButton.addEventListener('click', () => {
-                positiveThoughtModal.classList.add('hidden');
-            });
-        };
 
-        // --- Start the app ---
-        document.addEventListener('DOMContentLoaded', () => {
-            setupFirebase();
-            addListeners();
+        // Event Listeners
+        confessForm.addEventListener('submit', handleConfess);
+        secretsContainer.addEventListener('click', handleReaction);
+        secretInput.addEventListener('input', (e) => {
+            charCounterElement.textContent = `${e.target.value.length}/500`;
         });
+        
+        // Handle positive thought button click
+        showThoughtButton.addEventListener('click', async () => {
+            showThoughtButton.disabled = true;
+            thoughtTextElement.textContent = 'Generating a positive thought...';
+            positiveThoughtModal.classList.remove('hidden');
+
+            try {
+                const prompt = "Generate a short, positive, and encouraging thought or quote.";
+                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status} - ${response.statusText}`);
+                }
+                
+                const result = await response.json();
+                const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    thoughtTextElement.textContent = text;
+                } else {
+                    thoughtTextElement.textContent = "Oops! Couldn't generate a thought right now. Try again later!";
+                    console.error("Invalid API response format or no candidates.");
+                }
+            } catch (error) {
+                console.error("Error generating positive thought:", error);
+                thoughtTextElement.textContent = "Oops! Couldn't generate a thought right now. Try again later!";
+            } finally {
+                showThoughtButton.disabled = false;
+            }
+        });
+
+        // Handle modal close button click
+        closeModalButton.addEventListener('click', () => {
+            positiveThoughtModal.classList.add('hidden');
+        });
+
+        // Initialize the app
+        setupFirebase();
     </script>
 </body>
 </html>
