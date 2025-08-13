@@ -100,15 +100,7 @@
                 Recent Whispers
             </h2>
             
-            <!-- Loading state -->
-            <div id="loading-state" class="text-center text-gray-300 py-12">
-                <div class="flex items-center justify-center">
-                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-300 mr-2"></div>
-                    <span class="text-xl font-medium">Connecting to whispers...</span>
-                </div>
-            </div>
-
-            <div id="secrets-container" class="space-y-6 hidden">
+            <div id="secrets-container" class="space-y-6">
                 <!-- Secrets will be dynamically inserted here -->
             </div>
 
@@ -129,7 +121,7 @@
     <div id="positive-thought-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden animate-modal-fade-in">
         <div class="bg-[#5b6a53] p-8 rounded-2xl shadow-xl w-full max-w-md border border-[#7d8b74] relative">
             <button id="close-modal-button" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
-                <svg xmlns="http://www.w3.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
@@ -151,41 +143,80 @@
         import { getFirestore, collection, onSnapshot, query, addDoc, doc, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Global Variables (provided by Canvas) ---
+        // This is the correct way to get the Firebase config in the Canvas environment.
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-        const firebaseConfig = {
-  apiKey: "AIzaSyCERwY9HmAAdbPiufATtci6PT-jwBEj0sM",
-  authDomain: "whispers-online.firebaseapp.com",
-  projectId: "whispers-online",
-  storageBucket: "whispers-online.firebasestorage.app",
-  messagingSenderId: "1010119542710",
-  appId: "1:1010119542710:web:f90cadfd81aef85e9ee317",
- measurementId: "G-9FFR6SP6T0"
-};
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
+
         // --- Firebase Initialization and Auth ---
         let app, db, auth;
         let userId = 'N/A';
         const collectionPath = `artifacts/${appId}/public/data/secrets`;
-
-        // --- DOM Elements ---
         const userIdDisplay = document.getElementById('user-id-display');
         const toastElement = document.getElementById('toast-message');
-        const confessButton = document.getElementById('confess-button');
-        const confessForm = document.getElementById('confess-form');
-        const secretInput = document.getElementById('secret-input');
-        const secretsContainer = document.getElementById('secrets-container');
-        const whisperCountElement = document.getElementById('whisper-count');
-        const emptyStateElement = document.getElementById('empty-state');
-        const loadingStateElement = document.getElementById('loading-state');
-        const charCounterElement = document.getElementById('char-counter');
-        const showThoughtButton = document.getElementById('show-thought-button');
-        const positiveThoughtModal = document.getElementById('positive-thought-modal');
-        const thoughtTextElement = document.getElementById('thought-text');
-        const closeModalButton = document.getElementById('close-modal-button');
 
-        // --- Data & Configuration ---
+        // Function to initialize Firebase and set up authentication
+        const setupFirebase = async () => {
+            try {
+                // Check if the firebaseConfig object is properly populated
+                if (!firebaseConfig) {
+                    console.error("Firebase config is missing. Please run this app in the Canvas environment.");
+                    showToast('App failed to initialize: Firebase config incomplete.', 'error');
+                    return;
+                }
+                
+                // Initialize Firebase services
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                // Sign in the user, either with the custom token or anonymously
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                
+                // Set up auth state listener after successful sign-in
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        userIdDisplay.textContent = `User ID: ${userId}`;
+                        startRealtimeListener();
+                    } else {
+                        console.error('Authentication failed.');
+                        showToast('Authentication failed. Please try again.', 'error');
+                    }
+                });
+            } catch (error) {
+                console.error("Error during Firebase setup:", error);
+                showToast('App failed to initialize. Please check console.', 'error');
+            }
+        };
+
+        // Function to set up the Firestore listener for real-time updates
+        const startRealtimeListener = () => {
+            if (!db) {
+                console.error('Firestore not initialized.');
+                return;
+            }
+
+            // Listen for all secrets and sort them client-side
+            const q = query(collection(db, collectionPath));
+            
+            onSnapshot(q, (snapshot) => {
+                const secrets = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                    timestamp: doc.data().timestamp?.toDate().getTime() || Date.now()
+                }));
+                // Sort the secrets by timestamp in descending order in the client
+                secrets.sort((a, b) => b.timestamp - a.timestamp);
+                renderSecrets(secrets);
+            });
+        };
+
+        // --- UI & State Management ---
         const emotions = [
             { emoji: '❤️', label: 'Love' },
             { emoji: '😂', label: 'Laugh' },
@@ -194,6 +225,18 @@
             { emoji: '😮', label: 'Surprise' },
             { emoji: '👏', label: 'Clap' },
         ];
+
+        const confessForm = document.getElementById('confess-form');
+        const secretInput = document.getElementById('secret-input');
+        const confessButton = document.getElementById('confess-button');
+        const secretsContainer = document.getElementById('secrets-container');
+        const whisperCountElement = document.getElementById('whisper-count');
+        const emptyStateElement = document.getElementById('empty-state');
+        const charCounterElement = document.getElementById('char-counter');
+        const showThoughtButton = document.getElementById('show-thought-button');
+        const positiveThoughtModal = document.getElementById('positive-thought-modal');
+        const thoughtTextElement = document.getElementById('thought-text');
+        const closeModalButton = document.getElementById('close-modal-button');
 
         const positiveThoughts = [
             "Believe you can and you're halfway there.",
@@ -208,7 +251,7 @@
             "Don't wait for opportunity. Create it.",
             "What you get by achieving your goals is not as important as what you become by achieving your goals.",
         ];
-
+        
         // --- Utility Functions ---
         const showToast = (message, type = 'info') => {
             let bgColorClass;
@@ -242,13 +285,10 @@
             secretsContainer.innerHTML = '';
             whisperCountElement.textContent = `✨ ${secrets.length} whispers shared so far`;
 
-            loadingStateElement.classList.add('hidden');
-            secretsContainer.classList.remove('hidden');
-
             if (secrets.length === 0) {
-                emptyStateElement.classList.remove('hidden');
+                emptyStateElement.style.display = 'block';
             } else {
-                emptyStateElement.classList.add('hidden');
+                emptyStateElement.style.display = 'none';
                 secrets.forEach((secret, index) => {
                     const secretElement = document.createElement('div');
                     secretElement.className = "group p-6 bg-[#5b6a53] rounded-xl shadow-lg border border-[#7d8b74] hover:shadow-xl transition-all duration-300 hover:scale-[1.01]";
@@ -297,7 +337,7 @@
                 });
             }
         };
-        
+
         // --- Event Handlers ---
         const handleConfess = async (e) => {
             e.preventDefault();
@@ -308,7 +348,7 @@
                 return;
             }
 
-            if (!db || !auth || !auth.currentUser) {
+            if (!db) {
                 showToast('App is not connected. Please refresh.', 'error');
                 return;
             }
@@ -344,12 +384,11 @@
             const button = e.target.closest('[data-emotion-label]');
             if (!button) return;
 
-            // FIX: Changed from data-emotion-label to emotionLabel
-            const emotionLabel = button.dataset.emotionLabel;
+            const emotionLabel = button.dataset.emotion-label;
             const secretCard = button.closest('[data-secret-id]');
             const secretId = secretCard.dataset.secretId;
             
-            if (!db || !auth || !auth.currentUser) {
+            if (!db) {
                 showToast('App is not connected. Please refresh.', 'error');
                 return;
             }
@@ -365,33 +404,10 @@
                     newReactions[emotionLabel] = (newReactions[emotionLabel] || 0) + 1;
                     transaction.update(docRef, { reactions: newReactions });
                 });
-                showToast('Reaction added!', 'success');
             } catch (error) {
                 console.error("Transaction failed: ", error);
                 showToast('Failed to add reaction. Please try again.', 'error');
             }
-        };
-
-        // Function to set up the Firestore listener for real-time updates
-        const startRealtimeListener = () => {
-            if (!db) {
-                console.error('Firestore not initialized.');
-                return;
-            }
-
-            // Listen for all secrets and sort them client-side
-            const q = query(collection(db, collectionPath));
-            
-            onSnapshot(q, (snapshot) => {
-                const secrets = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data(),
-                    timestamp: doc.data().timestamp?.toDate().getTime() || Date.now()
-                }));
-                // Sort the secrets by timestamp in descending order in the client
-                secrets.sort((a, b) => b.timestamp - a.timestamp);
-                renderSecrets(secrets);
-            });
         };
         
         // --- Event Listeners ---
@@ -412,45 +428,10 @@
         };
 
         // --- Start the app ---
-        const setupFirebase = async () => {
-            confessButton.disabled = true;
-            loadingStateElement.classList.remove('hidden');
-            try {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        userIdDisplay.textContent = `User ID: ${userId}`;
-                        startRealtimeListener();
-                        addListeners();
-                        confessButton.disabled = false;
-                        loadingStateElement.classList.add('hidden');
-                        showToast('Connected to Firebase successfully!', 'success');
-                    } else {
-                        console.error('Authentication failed.');
-                        showToast('Authentication failed. Please try again.', 'error');
-                        confessButton.disabled = true;
-                        loadingStateElement.textContent = 'Failed to connect.';
-                    }
-                });
-            } catch (error) {
-                console.error("Error during Firebase setup:", error);
-                showToast('App failed to initialize. Please check console.', 'error');
-                confessButton.disabled = true;
-                loadingStateElement.textContent = 'Failed to connect.';
-            }
-        };
-
-        setupFirebase();
+        document.addEventListener('DOMContentLoaded', () => {
+            setupFirebase();
+            addListeners();
+        });
     </script>
 </body>
 </html>
